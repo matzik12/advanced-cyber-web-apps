@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # --- זה השרת המרכזי (המאוחד והתקין) ---
+  scanner_server:
+    build: .
+    container_name: scanner_server
+    ports:
+      - "8000:8000"
+    volumes:
+      # 1. גישה לדוקר של המארח (כדי להריץ את Zap/Nuclei/Wapiti)
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      # 2. מיפוי קוד המקור (כדי ש-giskard_wrapper.py יהיה זמין בפנים)
+      - ./:/app
+      
+      # 3. מיפוי תיקיית הדוחות (חשוב להשתמש בנתיב המלא כמו בקוד הפייתון)
+      - E:/cyber-project/vulnerabilities-report-app/docker/reports:/reports
+      
+    extra_hosts:
+      # 4. מאפשר ל-Giskard מתוך הקונטיינר לדבר עם Ollama במחשב שלך
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+  # --- כלי עזר (רק כדי להוריד את האימג'ים מראש) ---
+  wapiti:
+    image: cyberwatch/wapiti
+    profiles: ["tools"]
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: ["tools"]
+
+  nuclei:
+    image: projectdiscovery/nuclei:latest
+    profiles: ["tools"]
