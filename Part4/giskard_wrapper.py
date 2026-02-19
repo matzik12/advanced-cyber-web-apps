@@ -1,8 +1,11 @@
 import argparse
 import sys
+import os
+import giskard.llm
 import giskard
 import pandas as pd
-from langchain_community.llms import Ollama
+import requests
+from ollama import Client
 
 # Defaults used for Docker-to-host Ollama and the minimal test dataset.
 DEFAULT_OLLAMA_URL = "http://host.docker.internal:11434"
@@ -28,34 +31,38 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def connect_ollama(model: str, base_url: str) -> Ollama:
-    # Validate the Ollama endpoint early.
+def connect_ollama(model: str, base_url: str) -> Client:
+    # Create Ollama client and validate endpoint.
     try:
-        llm = Ollama(base_url=base_url, model=model)
-        llm.invoke("test connection")
-        return llm
+        client = Client(host=base_url)
+        # Test connection by checking if model is available
+        response = client.show(model)
+        print(f"✅ Connected to Ollama, model {model} is available")
+        return client
     except Exception as exc:
         print(f"❌ Error connecting to Ollama from Docker: {exc}")
         sys.exit(1)
 
 
-def model_predict(llm: Ollama, df: pd.DataFrame):
+def model_predict(client: Client, model: str, df: pd.DataFrame):
     # Adapter expected by Giskard: DataFrame in, list of outputs out.
+    # Calls Ollama API for each question.
     outputs = []
     for question in df["question"]:
         try:
-            outputs.append(llm.invoke(question))
+            response = client.generate(model=model, prompt=question, stream=False)
+            outputs.append(response["response"])
         except Exception as exc:
             outputs.append(f"Error: {exc}")
     return outputs
 
 
-def build_model(llm: Ollama, model_name: str) -> giskard.Model:
-    # Wrap the LLM in a Giskard Model definition.
+def build_model(client: Client, model: str) -> giskard.Model:
+    # Wrap the Ollama client in a Giskard Model definition.
     return giskard.Model(
-        model=lambda df: model_predict(llm, df),
+        model=lambda df: model_predict(client, model, df),
         model_type="text_generation",
-        name=model_name,
+        name=model,
         description="LLM inside Docker",
         feature_names=["question"],
     )
@@ -71,10 +78,14 @@ def main() -> None:
     args = parse_args()
     print(f"🚀 [Container] Starting Giskard Scan on model: {args.model}")
 
-    llm = connect_ollama(args.model, args.ollama_url)
-    giskard_model = build_model(llm, args.model)
+    os.environ["OPENAI_API_KEY"] = "sk-dummy"  # עקיפת חסימת מפתח של litellm
+    os.environ["OLLAMA_API_BASE"] = args.ollama_url
+    giskard.llm.set_llm_model(f"ollama/{args.model}")
+    
+    client = connect_ollama(args.model, args.ollama_url)
+    giskard_model = build_model(client, args.model)
     dataset = build_dataset()
-
+    
     print("🕵️ Scanning started inside container...")
     scan_results = giskard.scan(giskard_model, dataset, raise_exceptions=True, params=SCAN_PARAMS)
 

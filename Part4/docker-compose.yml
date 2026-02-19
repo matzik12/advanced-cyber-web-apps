@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  # --- Main security scanner server (unified and stable) ---
+  # --- Main security scanner server ---
   scanner_server:
     build: .
     container_name: scanner_server
     ports:
       - "8000:8000"
     volumes:
-      # 1. Access host Docker socket to run external tools (Zap/Nuclei/Wapiti)
+      # 1. Access host Docker socket to run external tools (Zap/Nuclei)
       - /var/run/docker.sock:/var/run/docker.sock
       
       # 2. Mount source code so giskard_wrapper.py is available inside container
@@ -17,17 +17,13 @@ services:
       # 3. Mount reports directory for output files
       - ./reports:/reports
     environment:
-      - REAL_HOST_PATH=${PWD}/reports
+      - REAL_HOST_PATH=${PWD}\\reports
     extra_hosts:
       # 4. Allow Giskard inside container to communicate with Ollama on host machine
       - "host.docker.internal:host-gateway"
     restart: always
 
   # --- Helper tool definitions (pre-pull images) ---
-  wapiti:
-    image: cyberwatch/wapiti
-    profiles: ["tools"]
-
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
     profiles: ["tools"]
