@@ -16,6 +16,7 @@ All tools run in parallel Docker containers, generating HTML and JSON reports in
 
 - Docker Desktop (with Docker Compose)
 - Ollama running locally on port 11434 (for Giskard LLM scanning)
+- llama3 installed in Ollama (for Giskard LLM scanning)
 - Python 3.10+
 
 ## Quick Start
