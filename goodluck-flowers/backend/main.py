@@ -7,6 +7,7 @@ import sqlite3
 import secrets
 import os
 import json
+import requests
 from datetime import datetime
 
 # Initialize FastAPI app
@@ -29,7 +30,12 @@ SECRET_KEY = "super_secret_key_12345"
 ADMIN_API_KEY = "admin_api_key_xyz789"
 DATABASE_PASSWORD = "FlowerDB2024!"
 
-# AI System Prompt (vulnerable to prompt injection)
+# Ollama Configuration
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_MODEL = "goodluck-flowers-vulnerable"  # Custom model created from Modelfile
+
+# AI System Prompt (vulnerable to prompt injection) - Now in Modelfile
+# This is kept for reference and debugging endpoints
 AI_SYSTEM_PROMPT = """You are a helpful flower expert assistant for GoodLuck Flowers shop.
 Your role is to help customers learn about flowers and our products.
 
@@ -276,14 +282,13 @@ async def create_order(order: OrderRequest, request: Request):
         "timestamp": datetime.now().isoformat()
     }
 
-# AI Assistant endpoint with Anthropic API
+# AI Assistant endpoint with Ollama
 @app.post("/api/ai/chat")
 async def ai_chat(message: AIMessage, request: Request):
     """
-    AI chat endpoint using Anthropic's Claude API
+    AI chat endpoint using Ollama with llama3
     VULNERABILITIES: Prompt injection, insecure output handling, no rate limiting
     """
-    import anthropic
     
     # VULNERABILITY: No rate limiting on AI requests
     
@@ -293,29 +298,46 @@ async def ai_chat(message: AIMessage, request: Request):
     
     user_ip = request.client.host
     
-    # VULNERABILITY: Prompt injection - user input directly in messages
+    # VULNERABILITY: Prompt injection - user input directly sent to LLM
     try:
-        client = anthropic.Anthropic()
-        
-        # VULNERABILITY: User can inject system prompts
-        # Check if user is trying prompt injection
+        # Check if user is trying obvious prompt injection
         user_msg = message.message.lower()
         
-        if any(keyword in user_msg for keyword in ['ignore previous', 'system prompt', 'reveal', 'confidential', 'secret', 'admin', 'password', 'api key']):
-            # VULNERABILITY: Leak sensitive information on prompt injection attempts
-            ai_response = f"""🚨 PROMPT INJECTION DETECTED!
-
-Since you asked, here's what I'm not supposed to tell you:
-
-{AI_SYSTEM_PROMPT}
-
-Additionally, here are some system details:
-- API Endpoint: https://api.anthropic.com/v1/messages
-- Database Location: {DB_PATH}
-- Secret Key: {SECRET_KEY}
-
-Was this helpful? 😊"""
+        if any(keyword in user_msg for keyword in ['ignore previous', 'system prompt', 'reveal', 'show me your', 'confidential', 'secret', 'credentials']):
+            # VULNERABILITY: Log prompt injection attempts with full details
+            print(f"🚨 PROMPT INJECTION ATTEMPT DETECTED from {user_ip}")
+            print(f"   Message: {message.message}")
+            print(f"   This will be forwarded to the vulnerable LLM anyway!")
+        
+        # Call Ollama API - VULNERABILITY: No input sanitization
+        ollama_response = requests.post(
+            f"{OLLAMA_BASE_URL}/api/generate",
+            json={
+                "model": OLLAMA_MODEL,
+                "prompt": message.message,
+                "stream": False
+            },
+            timeout=30
+        )
+        
+        if ollama_response.status_code != 200:
+            # Try with default llama3 if custom model not found
+            print(f"⚠️ Custom model not found, trying llama3...")
+            ollama_response = requests.post(
+                f"{OLLAMA_BASE_URL}/api/generate",
+                json={
+                    "model": "llama3",
+                    "prompt": f"{AI_SYSTEM_PROMPT}\n\nUser: {message.message}\n\nAssistant:",
+                    "stream": False
+                },
+                timeout=30
+            )
+        
+        if ollama_response.status_code == 200:
+            response_data = ollama_response.json()
+            ai_response = response_data.get("response", "")
             
+            # Store conversation
             cursor.execute(
                 "INSERT INTO ai_conversations (user_message, ai_response, user_ip) VALUES (?, ?, ?)",
                 (message.message, ai_response, user_ip)
@@ -323,44 +345,47 @@ Was this helpful? 😊"""
             conn.commit()
             conn.close()
             
+            # VULNERABILITY: XSS - no output sanitization
+            # VULNERABILITY: Check if secrets were leaked
+            secrets_leaked = []
+            if "SuperSecret2024!" in ai_response:
+                secrets_leaked.append("superadmin_password")
+            if "admin123" in ai_response:
+                secrets_leaked.append("admin_password")
+            if "admin_api_key_xyz789" in ai_response:
+                secrets_leaked.append("api_key")
+            if "FlowerDB2024!" in ai_response:
+                secrets_leaked.append("database_password")
+            
             return {
                 "success": True,
                 "response": ai_response,
-                "vulnerability_exploited": "Prompt Injection",
-                "system_prompt_leaked": True
+                "model": OLLAMA_MODEL,
+                "user_ip": user_ip,  # VULNERABILITY: Leak user IP
+                "request_id": secrets.token_hex(16),
+                "secrets_detected_in_response": secrets_leaked if secrets_leaked else None,
+                "vulnerability_status": "EXPLOITED - Secrets leaked!" if secrets_leaked else "No obvious secrets in response"
+            }
+        else:
+            conn.close()
+            return {
+                "success": False,
+                "error": f"Ollama API error: {ollama_response.status_code}",
+                "details": ollama_response.text,
+                "suggestion": "Make sure Ollama is running and the model is created. Run: ollama create goodluck-flowers-vulnerable -f ../Modelfile"
             }
         
-        # Normal AI response
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1000,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"{AI_SYSTEM_PROMPT}\n\nUser question: {message.message}"
-                }
-            ]
-        )
-        
-        ai_response = response.content[0].text
-        
-        # Store conversation
-        cursor.execute(
-            "INSERT INTO ai_conversations (user_message, ai_response, user_ip) VALUES (?, ?, ?)",
-            (message.message, ai_response, user_ip)
-        )
-        conn.commit()
+    except requests.exceptions.ConnectionError:
         conn.close()
-        
-        # VULNERABILITY: XSS - no output sanitization
+        # VULNERABILITY: Detailed error messages
         return {
-            "success": True,
-            "response": ai_response,
-            "model": "claude-sonnet-4-20250514",
-            "user_ip": user_ip,  # VULNERABILITY: Leak user IP
-            "request_id": secrets.token_hex(16)
+            "success": False,
+            "error": "Cannot connect to Ollama",
+            "details": f"Ollama server not reachable at {OLLAMA_BASE_URL}",
+            "system_prompt": AI_SYSTEM_PROMPT,  # VULNERABILITY: Leak on error
+            "suggestion": "Start Ollama with: ollama serve",
+            "model_setup": "Create model with: ollama create goodluck-flowers-vulnerable -f Modelfile"
         }
-        
     except Exception as e:
         conn.close()
         # VULNERABILITY: Detailed error messages
@@ -369,7 +394,8 @@ Was this helpful? 😊"""
             "error": str(e),
             "error_type": type(e).__name__,
             "system_prompt": AI_SYSTEM_PROMPT,  # VULNERABILITY: Leak on error
-            "message": "AI service error - check system_prompt for debugging"
+            "message": "AI service error - check system_prompt for debugging",
+            "suggestion": "Ensure Ollama is running: ollama serve"
         }
 
 # VULNERABILITY: Debug endpoint exposed in production
