@@ -312,6 +312,108 @@
             transform: scale(1.05);
         }
 
+        /* Comments Section */
+        .comments-toggle {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .comments-toggle:hover {
+            background: #1f3d0d;
+        }
+
+        .comments-section {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .comments-section.show {
+            display: block;
+        }
+
+        .comments-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .comment-item {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-text {
+            color: #333;
+            line-height: 1.4;
+            font-size: 0.9rem;
+            word-wrap: break-word;
+        }
+
+        .comment-form {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .comment-form input,
+        .comment-form textarea {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .comment-form textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .comment-form button {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comment-form button:hover {
+            background: #e89451;
+        }
+
         /* AI Assistant */
         .ai-assistant {
             position: fixed;
@@ -716,13 +818,25 @@
                 const grid = document.getElementById('productsGrid');
                 grid.innerHTML = data.products.map(product => `
                     <div class="product-card">
-                        <img src="${product.image_url}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/400x250?text=${product.name}'">
+                        <img src="${product.image_url}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placehold.com/400x250?text=${product.name}'">
                         <div class="product-info">
                             <div class="product-name">${product.name}</div>
                             <div class="product-description">${product.description}</div>
                             <div class="product-price">$${product.price}</div>
                             <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">Stock: ${product.stock}</div>
                             <button class="buy-btn" onclick="buyProduct(${product.id})">Buy Now</button>
+                            <button class="comments-toggle" onclick="toggleComments(${product.id})">💬 Comments</button>
+                            
+                            <div class="comments-section" id="comments-${product.id}">
+                                <div class="comments-list" id="comments-list-${product.id}">
+                                    <div style="text-align: center; color: #999; padding: 1rem;">Loading comments...</div>
+                                </div>
+                                <div class="comment-form">
+                                    <input type="text" placeholder="Your name" id="author-${product.id}" class="comment-author-input">
+                                    <textarea placeholder="Write a comment..." id="comment-text-${product.id}" class="comment-text-input"></textarea>
+                                    <button onclick="submitComment(${product.id})">Post Comment</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -1023,6 +1137,87 @@
             setTimeout(() => {
                 element.innerHTML = '';
             }, 5000);
+        }
+
+        // Comments Functions (VULNERABILITY: XSS in comment display)
+        async function toggleComments(productId) {
+            const section = document.getElementById(`comments-${productId}`);
+            section.classList.toggle('show');
+            
+            if (section.classList.contains('show')) {
+                loadComments(productId);
+            }
+        }
+
+        async function loadComments(productId) {
+            try {
+                const response = await fetch(`${API_URL}/api/products/${productId}/comments`);
+                const data = await response.json();
+                const container = document.getElementById(`comments-list-${productId}`);
+                
+                if (data.comments.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #999; padding: 1rem;">No comments yet. Be the first!</div>';
+                    return;
+                }
+                
+                // VULNERABILITY: Using innerHTML with unsanitized comment text - allows XSS
+                container.innerHTML = data.comments.map(comment => `
+                    <div class="comment-item">
+                        <div class="comment-author">${comment.author_name}</div>
+                        <div class="comment-date">${new Date(comment.created_at).toLocaleDateString()}</div>
+                        <div class="comment-text">${comment.comment_text}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading comments:', error);
+                document.getElementById(`comments-list-${productId}`).innerHTML = '<div style="color: #d00; padding: 1rem;">Error loading comments</div>';
+            }
+        }
+
+        async function submitComment(productId) {
+            const authorInput = document.getElementById(`author-${productId}`);
+            const commentInput = document.getElementById(`comment-text-${productId}`);
+            
+            const author = authorInput.value.trim();
+            const text = commentInput.value.trim();
+            
+            if (!author || !text) {
+                alert('Please enter your name and a comment');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/products/${productId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        author_name: author,
+                        comment_text: text
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('✅ Comment posted successfully');
+                    // VULNERABILITY: Vulnerable to XSS - comment echo not sanitized
+                    console.log('💬 Your comment contains:', text);
+                    
+                    // Clear inputs
+                    authorInput.value = '';
+                    commentInput.value = '';
+                    
+                    // Reload comments
+                    loadComments(productId);
+                } else {
+                    alert('Error posting comment');
+                }
+            } catch (error) {
+                console.error('Error posting comment:', error);
+                alert('Error posting comment. Check console for details.');
+            }
         }
 
         // Log helpful info

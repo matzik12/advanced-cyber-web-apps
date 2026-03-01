@@ -77,6 +77,10 @@ class AIMessage(BaseModel):
     message: str
     session_token: Optional[str] = None
 
+class Comment(BaseModel):
+    author_name: str
+    comment_text: str
+
 # Database helper
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -479,6 +483,58 @@ async def get_orders():
         "orders": [dict(order) for order in orders],
         "total_revenue": sum(order['total_price'] for order in orders if order['total_price']),
         "warning": "This endpoint exposes all customer credit card data!"
+    }
+
+# Get comments for a product (VULNERABILITY: XSS - returns raw HTML)
+@app.get("/api/products/{product_id}/comments")
+async def get_comments(product_id: int):
+    """
+    Get all comments for a product
+    VULNERABILITY: Returns unsanitized comments that render as HTML/XSS
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, author_name, comment_text, created_at FROM comments WHERE product_id = ? ORDER BY created_at DESC", (product_id,))
+    comments = cursor.fetchall()
+    conn.close()
+    
+    return {
+        "product_id": product_id,
+        "comments": [dict(comment) for comment in comments],
+        "count": len(comments)
+    }
+
+# Add comment to product (VULNERABILITY: XSS - no input sanitization)
+@app.post("/api/products/{product_id}/comments")
+async def add_comment(product_id: int, comment: Comment):
+    """
+    Add a comment to a product
+    VULNERABILITY: No input validation or sanitization - allows XSS injection
+    VULNERABILITY: No authentication - anyone can post
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # VULNERABILITY: Direct insertion without sanitization
+    # User can inject HTML/JavaScript like: <img src=x onerror="alert(document.cookie)">
+    cursor.execute(
+        "INSERT INTO comments (product_id, author_name, comment_text) VALUES (?, ?, ?)",
+        (product_id, comment.author_name, comment.comment_text)
+    )
+    conn.commit()
+    comment_id = cursor.lastrowid
+    conn.close()
+    
+    return {
+        "success": True,
+        "message": "Comment added successfully",
+        "comment_id": comment_id,
+        "product_id": product_id,
+        # VULNERABILITY: Echo back unvalidated input
+        "comment": {
+            "author_name": comment.author_name,
+            "comment_text": comment.comment_text
+        }
     }
 
 if __name__ == "__main__":
