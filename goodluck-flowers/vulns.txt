@@ -1,0 +1,8 @@
+OWASP TOP TEN: A01:2025 Broken Access Control
+http://localhost:8000/api/users
+http://localhost:8000/api/orders
+
+OWASP TOP TEN: A05:2025 Injection
+login vuln:
+username: admin' --
+password: whatever_you_want

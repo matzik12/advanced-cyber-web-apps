@@ -79,6 +79,18 @@ def init_database():
         )
     ''')
     
+    # Create comments table (VULNERABILITY: XSS - comments not sanitized)
+    cursor.execute('''
+        CREATE TABLE comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL,
+            author_name TEXT NOT NULL,
+            comment_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+    ''')
+    
     # VULNERABILITY: Store passwords in plain text (bad practice for demonstration)
     # Insert default users
     users = [
