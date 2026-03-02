@@ -6,3 +6,9 @@ OWASP TOP TEN: A05:2025 Injection
 login vuln:
 username: admin' --
 password: whatever_you_want
+
+
+A05:2025 Injection
+flowers commetns:
+header: whatever_you_want
+content: <img src=x onerror="alert('XSS Vulnerability! You have been hacked!')">
