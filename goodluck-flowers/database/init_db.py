@@ -108,12 +108,14 @@ def init_database():
     
     # Insert products
     products = [
-        ('Rose Elegance', 'Stunning red roses perfect for any romantic occasion', 49.99, 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400', 50),
-        ('Tulip Dreams', 'Colorful tulips bringing spring joy to your home', 39.99, 'https://images.unsplash.com/photo-1520763185298-1b434c919102?w=400', 75),
-        ('Orchid Paradise', 'Exotic orchids for the sophisticated flower lover', 69.99, 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400', 30),
-        ('Sunflower Joy', 'Bright sunflowers to light up any room', 34.99, 'https://images.unsplash.com/photo-1597848212624-e5f6d0d6c521?w=400', 100),
-        ('Lily Garden', 'Graceful lilies with an enchanting fragrance', 44.99, 'https://images.unsplash.com/photo-1602143407923-e4cf88e0da88?w=400', 60),
-        ('Peony Bliss', 'Lush peonies perfect for special celebrations', 59.99, 'https://images.unsplash.com/photo-1591886960571-74d43a9d4166?w=400', 40)
+        ('Rose Elegance', 'Stunning red roses perfect for any romantic occasion', 49.99, '/images/roses.jpg', 50),
+        ('Tulip Dreams', 'Colorful tulips bringing spring joy to your home', 39.99, '/images/tulips.jpg', 75),
+        ('Orchid Paradise', 'Exotic orchids for the sophisticated flower lover', 69.99, '/images/orchids.jpg', 30),
+        ('Sunflower Joy', 'Bright sunflowers to light up any room', 34.99, '/images/sunflowers.jpg', 100),
+        ('Lily Garden', 'Graceful lilies with an enchanting fragrance', 44.99, '/images/lilies.jpg', 60),
+        ('Peony Bliss', 'Lush peonies perfect for special celebrations', 59.99, '/images/peonies.jpg', 40),
+        ('Daisies Delight', 'Cheerful daisies symbolizing innocence and purity', 32.99, '/images/daisies.jpg', 80),
+        ('Mixed Bouquet', 'Beautiful mix of seasonal flowers', 49.99, '/images/mixed.jpg', 40)
     ]
     
     cursor.executemany(

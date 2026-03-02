@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List
 import sqlite3
@@ -24,6 +25,10 @@ app.add_middleware(
 
 # Database path
 DB_PATH = os.path.join(os.path.dirname(__file__), '../database/flowers.db')
+
+# Serve images from frontend/images
+IMAGES_DIR = os.path.join(os.path.dirname(__file__), '../frontend/images')
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 # VULNERABILITY: Hardcoded secrets and API keys
 SECRET_KEY = "super_secret_key_12345"
