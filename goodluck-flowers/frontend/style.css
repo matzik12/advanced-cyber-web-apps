@@ -312,6 +312,17 @@ nav {
     background: #e89451;
 }
 
+/* Comment Form Actions Row */
+.comment-form-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.comment-form-actions button:first-child {
+    flex: 1;
+}
+
 /* Comments Section */
 .comments-toggle {
     width: 100%;
@@ -399,7 +410,7 @@ nav {
 }
 
 .comment-form button {
-    width: 100%;
+    flex: 1;
     background: var(--accent);
     color: white;
     border: none;
@@ -412,6 +423,21 @@ nav {
 
 .comment-form button:hover {
     background: #e89451;
+}
+
+.comment-form .clue-toggle-btn {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+.comment-form .clue-toggle-btn:hover {
+    background: var(--accent);
+    color: white;
 }
 
 /* AI Assistant */
@@ -574,4 +600,45 @@ nav {
     text-align: center;
     padding: 2rem;
     color: #666;
+}
+
+/* Login Clue Toggle */
+.clue-container {
+    margin-top: 1rem;
+    text-align: right;
+}
+
+.clue-toggle-btn {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.clue-toggle-btn:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.clue-bubble {
+    display: none;
+    margin-top: 0.5rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.clue-bubble.show {
+    display: block;
 }

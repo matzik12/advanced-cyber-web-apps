@@ -98,8 +98,11 @@
                 <input type="password" id="loginPassword" placeholder="Enter password">
             </div>
             <button class="btn btn-primary" onclick="login()">Login</button>
-            <div style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-                <p>💡 Try SQL injection: <code>admin' OR '1'='1</code></p>
+            <div class="clue-container">
+                <button class="clue-toggle-btn" onclick="toggleLoginClue()">💡 Clue</button>
+                <div class="clue-bubble" id="loginClue">
+                    SQL injection: <code>admin' --</code>
+                </div>
             </div>
         </div>
     </div>

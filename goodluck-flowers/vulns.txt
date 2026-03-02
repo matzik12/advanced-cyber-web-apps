@@ -9,6 +9,6 @@ password: whatever_you_want
 
 
 A05:2025 Injection
-flowers commetns:
+flowers comments:
 header: whatever_you_want
 content: <img src=x onerror="alert('XSS Vulnerability! You have been hacked!')">

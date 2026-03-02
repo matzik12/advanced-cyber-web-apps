@@ -37,7 +37,13 @@ async function loadProducts() {
                         <div class="comment-form">
                             <input type="text" placeholder="Your name" id="author-${product.id}" class="comment-author-input">
                             <textarea placeholder="Write a comment..." id="comment-text-${product.id}" class="comment-text-input"></textarea>
-                            <button onclick="submitComment(${product.id})">Post Comment</button>
+                            <div class="comment-form-actions">
+                                <button onclick="submitComment(${product.id})">Post Comment</button>
+                                <button class="clue-toggle-btn" onclick="toggleCardClue(${product.id})">💡 Clue</button>
+                            </div>
+                            <div class="clue-bubble" id="cardClue-${product.id}">
+                                XSS: Try posting <code>&lt;img src=x onerror=alert('XSS')&gt;</code> as a comment
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -430,3 +436,11 @@ console.log('🎯 Backend API:', API_URL);
 console.log('💡 Try SQL injection, access /api/users, check /api/debug/config');
 console.log('🔍 Use Help button for more clues!');
 console.log('📚 API Docs: http://localhost:8000/docs');
+
+function toggleLoginClue() {
+    document.getElementById('loginClue').classList.toggle('show');
+}
+
+function toggleCardClue(productId) {
+    document.getElementById('cardClue-' + productId).classList.toggle('show');
+}
