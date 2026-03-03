@@ -1,0 +1,644 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2d5016;
+    --secondary: #8b4789;
+    --accent: #f4a261;
+    --light: #fef8f3;
+    --dark: #1a1a1a;
+    --success: #52b788;
+    --danger: #e63946;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #fef8f3 0%, #f8e8d8 100%);
+    color: var(--dark);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Header */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Crimson Pro', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo::before {
+    content: '🌸';
+    font-size: 2rem;
+}
+
+nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-btn {
+    background: none;
+    border: 2px solid var(--primary);
+    padding: 0.6rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    color: var(--primary);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+}
+
+.nav-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+/* Help Button */
+.help-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(244, 162, 97, 0.4);
+    z-index: 1001;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+}
+
+.help-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(244, 162, 97, 0.5);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: var(--danger);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--dark);
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1f3710;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 80, 22, 0.3);
+}
+
+/* Products Grid */
+.products-section {
+    padding: 4rem 0;
+}
+
+.section-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 3rem;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.product-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    will-change: transform;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.product-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+    background: #f0ebe5;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.product-image.loaded {
+    opacity: 1;
+}
+
+.product-info {
+    padding: 1.5rem;
+}
+
+.product-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.product-description {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.product-price {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 1rem;
+}
+
+.buy-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.buy-btn:hover {
+    background: #e89451;
+}
+
+/* Comment Form Actions Row */
+.comment-form-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.comment-form-actions button:first-child {
+    flex: 1;
+}
+
+/* Comments Section */
+.comments-toggle {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.comments-toggle:hover {
+    background: #1f3d0d;
+}
+
+.comments-section {
+    display: none;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.comments-section.show {
+    display: block;
+}
+
+.comments-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.comment-item {
+    background: #f8f8f8;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+    border-left: 4px solid var(--secondary);
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+
+.comment-text {
+    color: #333;
+    line-height: 1.4;
+    font-size: 0.9rem;
+    word-wrap: break-word;
+}
+
+.comment-form {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.comment-form input,
+.comment-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+}
+
+.comment-form textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.comment-form button {
+    flex: 1;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.comment-form button:hover {
+    background: #e89451;
+}
+
+.comment-form .clue-toggle-btn {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+.comment-form .clue-toggle-btn:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* AI Assistant */
+.ai-assistant {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    width: 400px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+    max-height: 600px;
+    z-index: 1001;
+}
+
+.ai-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-header h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.3rem;
+}
+
+.ai-messages {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.bot {
+    background: #f0f0f0;
+    margin-right: auto;
+}
+
+.message.user {
+    background: var(--primary);
+    color: white;
+    margin-left: auto;
+}
+
+.ai-input-area {
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.ai-input {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.ai-send-btn {
+    padding: 0.8rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Admin Panel */
+.admin-panel {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.admin-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Hide sections by default */
+.hidden {
+    display: none !important;
+}
+
+/* Help Clues */
+.clue {
+    background: linear-gradient(135deg, #fff5e6, #ffe6f0);
+    border-left: 4px solid var(--accent);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+}
+
+.clue-title {
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+}
+
+.clue-text {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.vulnerability-category {
+    margin-bottom: 2rem;
+}
+
+.vulnerability-category h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+/* Login Clue Toggle */
+.clue-container {
+    margin-top: 1rem;
+    text-align: right;
+}
+
+.clue-toggle-btn {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.clue-toggle-btn:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.clue-bubble {
+    display: none;
+    margin-top: 0.5rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.clue-bubble.show {
+    display: block;
+}

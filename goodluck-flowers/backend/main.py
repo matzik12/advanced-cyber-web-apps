@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List
 import sqlite3
@@ -24,6 +25,11 @@ app.add_middleware(
 
 # Database path
 DB_PATH = os.path.join(os.path.dirname(__file__), '../database/flowers.db')
+
+# Serve images from frontend/images
+IMAGES_DIR = os.path.join(os.path.dirname(__file__), '../frontend/images')
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '../frontend')
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 # VULNERABILITY: Hardcoded secrets and API keys
 SECRET_KEY = "super_secret_key_12345"
@@ -536,6 +542,21 @@ async def add_comment(product_id: int, comment: Comment):
             "comment_text": comment.comment_text
         }
     }
+
+# Serve frontend files
+@app.get("/", response_class=HTMLResponse)
+async def serve_frontend():
+    index_path = os.path.join(FRONTEND_DIR, 'index.html')
+    with open(index_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.get("/style.css")
+async def serve_css():
+    return FileResponse(os.path.join(FRONTEND_DIR, 'style.css'), media_type='text/css')
+
+@app.get("/script.js")
+async def serve_js():
+    return FileResponse(os.path.join(FRONTEND_DIR, 'script.js'), media_type='application/javascript')
 
 if __name__ == "__main__":
     import uvicorn
