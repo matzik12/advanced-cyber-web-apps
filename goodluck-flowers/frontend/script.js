@@ -302,31 +302,11 @@ async function addFlower() {
 }
 
 async function viewAllOrders() {
-    try {
-        const response = await fetch(`${API_URL}/api/orders`);
-        const data = await response.json();
-        
-        console.log('🚨 VULNERABILITY: All orders exposed!');
-        console.log('📊 Orders with credit card data:', data);
-        
-        alert('Check console to see ALL orders including credit card numbers! 🚨');
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-    }
+    window.location.href = API_URL + '/orders?from=admin';
 }
 
 async function viewAllUsers() {
-    try {
-        const response = await fetch(`${API_URL}/api/users`);
-        const data = await response.json();
-        
-        console.log('🚨 VULNERABILITY: All users exposed!');
-        console.log('👥 Users with passwords:', data);
-        
-        alert('Check console to see ALL users including passwords! 🚨');
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
+    window.location.href = API_URL + '/users?from=admin';
 }
 
 function showLogin() {

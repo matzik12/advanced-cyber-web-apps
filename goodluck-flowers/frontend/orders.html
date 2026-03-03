@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodLuck Flowers - Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .orders-section {
+            padding: 4rem 0;
+        }
+
+        .orders-table-wrapper {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.92rem;
+        }
+
+        .orders-table thead th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .orders-table thead th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .orders-table thead th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .orders-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f8f5f0;
+        }
+
+        .orders-table tbody td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .orders-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 10px;
+        }
+
+        .orders-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 10px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .revenue-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .revenue-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .revenue-card .label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.3rem;
+        }
+
+        .revenue-card .value {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: 2px solid var(--primary);
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: var(--primary);
+            transition: background 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+
+        .empty-state span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* Vulnerability Discovery Banner */
+        .vuln-banner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .vuln-banner {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 3px solid var(--success);
+            border-radius: 20px;
+            padding: 3rem 3.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(82, 183, 136, 0.35);
+            animation: popIn 0.4s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .vuln-banner .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .vuln-banner h2 {
+            font-family: 'Crimson Pro', serif;
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .vuln-banner p {
+            color: #155724;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .vuln-banner .vuln-tag {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .vuln-banner .dismiss-btn {
+            margin-top: 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .vuln-banner .dismiss-btn:hover {
+            background: #1f3710;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">GoodLuck Flowers</div>
+                <nav>
+                    <a href="/" class="nav-btn">Home</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="orders-section">
+            <a href="/" class="back-btn">← Back to Shop</a>
+            <h1 class="section-title">All Orders</h1>
+
+            <div id="ordersContent">
+                <div class="loading">Loading orders...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vulnerability Discovery Overlay (shown for non-admin users) -->
+    <div class="vuln-banner-overlay" id="vulnBanner" style="display:none;">
+        <div class="vuln-banner">
+            <div class="icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered the <strong>Broken Access Control</strong> vulnerability!</p>
+            <p>This page exposes all customer orders — including <strong>credit card numbers</strong> — without any authentication or authorization check.</p>
+            <span class="vuln-tag">OWASP A01:2021 – Broken Access Control</span>
+            <br>
+            <button class="dismiss-btn" onclick="document.getElementById('vulnBanner').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAccessAndLoad();
+        });
+
+        function checkAccessAndLoad() {
+            const params = new URLSearchParams(window.location.search);
+            const fromAdmin = params.get('from') === 'admin';
+
+            if (!fromAdmin) {
+                // Show vulnerability discovery banner when accessed directly via URL
+                document.getElementById('vulnBanner').style.display = 'flex';
+            }
+
+            // Still load the orders — the data exposure IS the vulnerability
+            loadOrders();
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch(`${API_URL}/api/orders`);
+                const data = await response.json();
+
+                const container = document.getElementById('ordersContent');
+
+                if (!data.orders || data.orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="orders-table-wrapper">
+                            <div class="empty-state">
+                                <span>📦</span>
+                                <p>No orders have been placed yet.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const totalRevenue = data.total_revenue ? data.total_revenue.toFixed(2) : '0.00';
+                const orderCount = data.orders.length;
+
+                let html = `
+                    <div class="revenue-bar">
+                        <div class="revenue-card">
+                            <div class="label">Total Orders</div>
+                            <div class="value">${orderCount}</div>
+                        </div>
+                        <div class="revenue-card">
+                            <div class="label">Total Revenue</div>
+                            <div class="value">$${totalRevenue}</div>
+                        </div>
+                    </div>
+
+                    <div class="orders-table-wrapper">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                    <th>Credit Card</th>
+                                    <th>CVV</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                data.orders.forEach(order => {
+                    const date = order.created_at
+                        ? new Date(order.created_at).toLocaleDateString()
+                        : 'N/A';
+                    const username = order.username || 'Guest';
+                    const product = order.product_name || `Product #${order.product_id}`;
+                    const status = order.status || 'completed';
+                    const badgeClass = status === 'completed' ? 'badge-completed' : 'badge-pending';
+
+                    html += `
+                        <tr>
+                            <td>#${order.id}</td>
+                            <td>${username}</td>
+                            <td>${product}</td>
+                            <td>${order.quantity}</td>
+                            <td>$${order.total_price ? order.total_price.toFixed(2) : '0.00'}</td>
+                            <td>${order.credit_card || '—'}</td>
+                            <td>${order.cvv || '—'}</td>
+                            <td><span class="badge ${badgeClass}">${status}</span></td>
+                            <td>${date}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load orders. Make sure the backend server is running on port 8000.
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
