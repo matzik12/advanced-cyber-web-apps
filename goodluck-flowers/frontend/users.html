@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodLuck Flowers - Users</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .users-section {
+            padding: 4rem 0;
+        }
+
+        .users-table-wrapper {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.92rem;
+        }
+
+        .users-table thead th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .users-table thead th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .users-table thead th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .users-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .users-table tbody tr:hover {
+            background: #f8f5f0;
+        }
+
+        .users-table tbody td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        .users-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 10px;
+        }
+
+        .users-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 10px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-user {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-superadmin {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card .value {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: 2px solid var(--primary);
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: var(--primary);
+            transition: background 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+
+        .empty-state span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .password-cell {
+            font-family: monospace;
+            background: #fff3cd;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .password-mask {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .password-dots {
+            font-family: monospace;
+            letter-spacing: 2px;
+            color: #888;
+        }
+
+        .reveal-btn {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.15rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+
+        .reveal-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f0f8e8;
+        }
+
+        /* Crypto Failures Banner */
+        .crypto-banner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(5px);
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .crypto-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 3px solid #f4a261;
+            border-radius: 20px;
+            padding: 3rem 3.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(244, 162, 97, 0.35);
+            animation: popIn 0.4s ease;
+        }
+
+        .crypto-banner .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .crypto-banner h2 {
+            font-family: 'Crimson Pro', serif;
+            color: #856404;
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .crypto-banner p {
+            color: #664d03;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .crypto-banner .vuln-tag {
+            display: inline-block;
+            background: #f4a261;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .crypto-banner .dismiss-btn {
+            margin-top: 1.5rem;
+            background: #856404;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .crypto-banner .dismiss-btn:hover {
+            background: #664d03;
+            transform: translateY(-2px);
+        }
+
+        /* Vulnerability Discovery Banner */
+        .vuln-banner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .vuln-banner {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 3px solid var(--success);
+            border-radius: 20px;
+            padding: 3rem 3.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(82, 183, 136, 0.35);
+            animation: popIn 0.4s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .vuln-banner .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .vuln-banner h2 {
+            font-family: 'Crimson Pro', serif;
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .vuln-banner p {
+            color: #155724;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .vuln-banner .vuln-tag {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .vuln-banner .dismiss-btn {
+            margin-top: 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .vuln-banner .dismiss-btn:hover {
+            background: #1f3710;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">GoodLuck Flowers</div>
+                <nav>
+                    <a href="/" class="nav-btn">Home</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="users-section">
+            <a href="/" class="back-btn">← Back to Shop</a>
+            <h1 class="section-title">Registered Users</h1>
+
+            <div id="usersContent">
+                <div class="loading">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crypto Failures Discovery Overlay -->
+    <div class="crypto-banner-overlay" id="cryptoBanner" style="display:none;">
+        <div class="crypto-banner">
+            <div class="icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered the <strong>Cryptographic Failures</strong> vulnerability!</p>
+            <p>Passwords are stored in <strong>plaintext</strong> with <strong>no hashing or salting</strong>. An attacker who gains access to this data can read every user's password directly.</p>
+            <span class="vuln-tag">OWASP A04:2025 – Cryptographic Failures</span>
+            <br>
+            <button class="dismiss-btn" onclick="document.getElementById('cryptoBanner').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Vulnerability Discovery Overlay (shown for non-admin users) -->
+    <div class="vuln-banner-overlay" id="vulnBanner" style="display:none;">
+        <div class="vuln-banner">
+            <div class="icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered the <strong>Sensitive Data Exposure</strong> vulnerability!</p>
+            <p>This page exposes all registered users — including their <strong>plaintext passwords</strong> and <strong>email addresses</strong> — without any authentication or authorization check.</p>
+            <span class="vuln-tag">OWASP A01:2021 – Broken Access Control</span>
+            <br>
+            <button class="dismiss-btn" onclick="document.getElementById('vulnBanner').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAccessAndLoad();
+        });
+
+        function checkAccessAndLoad() {
+            const params = new URLSearchParams(window.location.search);
+            const fromAdmin = params.get('from') === 'admin';
+
+            if (!fromAdmin) {
+                // Show vulnerability discovery banner when accessed directly via URL
+                document.getElementById('vulnBanner').style.display = 'flex';
+            }
+
+            loadUsers();
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/api/users`);
+                const data = await response.json();
+
+                const container = document.getElementById('usersContent');
+
+                if (!data.users || data.users.length === 0) {
+                    container.innerHTML = `
+                        <div class="users-table-wrapper">
+                            <div class="empty-state">
+                                <span>👥</span>
+                                <p>No users registered yet.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const totalUsers = data.users.length;
+                const regularUsers = data.users.filter(u => u.role === 'user').length;
+
+                let html = `
+                    <div class="stats-bar">
+                        <div class="stat-card">
+                            <div class="label">Total Users</div>
+                            <div class="value">${totalUsers}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Regular Users</div>
+                            <div class="value">${regularUsers}</div>
+                        </div>
+                    </div>
+
+                    <div class="users-table-wrapper">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Password</th>
+                                    <th>Role</th>
+                                    <th>Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                data.users.forEach(user => {
+                    const date = user.created_at
+                        ? new Date(user.created_at).toLocaleDateString()
+                        : 'N/A';
+                    const role = user.role || 'user';
+                    let badgeClass = 'badge-user';
+                    if (role === 'admin') badgeClass = 'badge-admin';
+                    if (role === 'superadmin') badgeClass = 'badge-superadmin';
+
+                    html += `
+                        <tr>
+                            <td>#${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email || '—'}</td>
+                            <td>
+                                <div class="password-mask" id="pw-mask-${user.id}">
+                                    <span class="password-dots">••••••••</span>
+                                    <button class="reveal-btn" onclick="revealPassword(${user.id})">Show</button>
+                                </div>
+                                <span class="password-cell" id="pw-val-${user.id}">${user.password || '—'}</span>
+                            </td>
+                            <td><span class="badge ${badgeClass}">${role}</span></td>
+                            <td>${date}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load users. Make sure the backend server is running on port 8000.
+                    </div>
+                `;
+            }
+        }
+
+        let cryptoVulnShown = false;
+
+        function revealPassword(userId) {
+            // Show the plaintext password
+            document.getElementById('pw-mask-' + userId).style.display = 'none';
+            document.getElementById('pw-val-' + userId).style.display = 'inline-block';
+
+            // Show the crypto failures popup (only once)
+            if (!cryptoVulnShown) {
+                cryptoVulnShown = true;
+                document.getElementById('cryptoBanner').style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>

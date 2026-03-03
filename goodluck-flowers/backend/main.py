@@ -550,6 +550,20 @@ async def serve_frontend():
     with open(index_path, 'r', encoding='utf-8') as f:
         return f.read()
 
+# VULNERABILITY: No auth check - serves orders page to anyone
+@app.get("/orders", response_class=HTMLResponse)
+async def serve_orders():
+    orders_path = os.path.join(FRONTEND_DIR, 'orders.html')
+    with open(orders_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+# VULNERABILITY: No auth check - serves users page to anyone
+@app.get("/users", response_class=HTMLResponse)
+async def serve_users():
+    users_path = os.path.join(FRONTEND_DIR, 'users.html')
+    with open(users_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.get("/style.css")
 async def serve_css():
     return FileResponse(os.path.join(FRONTEND_DIR, 'style.css'), media_type='text/css')

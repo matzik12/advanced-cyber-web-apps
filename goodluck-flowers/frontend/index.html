@@ -232,6 +232,32 @@
         </div>
     </div>
 
+    <!-- SQL Injection Discovery Popup -->
+    <div class="vuln-popup-overlay" id="sqliPopup" style="display:none;">
+        <div class="vuln-popup sqli">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered the <strong>Injection</strong> vulnerability!</p>
+            <p>You bypassed authentication using <strong>SQL Injection</strong>. The login query uses string concatenation instead of parameterized queries, allowing you to manipulate the SQL logic.</p>
+            <span class="vuln-tag">OWASP A05:2025 – Injection</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('sqliPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- XSS Injection Discovery Popup -->
+    <div class="vuln-popup-overlay" id="xssPopup" style="display:none;">
+        <div class="vuln-popup xss">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered the <strong>Cross-Site Scripting (XSS)</strong> vulnerability!</p>
+            <p>You injected JavaScript code through the <strong>comment section</strong>. User input is rendered as raw HTML without sanitization, allowing arbitrary script execution.</p>
+            <span class="vuln-tag">OWASP A05:2025 – Injection (XSS)</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('xssPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

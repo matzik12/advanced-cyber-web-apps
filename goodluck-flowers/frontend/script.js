@@ -2,6 +2,21 @@ const API_URL = 'http://localhost:8000';
 let currentUser = null;
 let currentProductForPurchase = null;
 
+// Override alert() to catch XSS exploitation and show discovery popup
+const originalAlert = window.alert;
+window.alert = function(msg) {
+    // Check if this is an XSS-triggered alert (from onerror, script injection, etc.)
+    if (typeof msg === 'string' && msg.toUpperCase().includes('XSS')) {
+        const xssPopup = document.getElementById('xssPopup');
+        if (xssPopup) {
+            xssPopup.style.display = 'flex';
+            return;
+        }
+    }
+    // For all other alerts, use the original
+    originalAlert.call(window, msg);
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
@@ -109,10 +124,15 @@ async function login() {
             document.getElementById('logoutBtn').style.display = 'block';
             
             // Show SQL injection success
-            if (data.debug_query && (data.debug_query.includes("OR '1'='1'") || data.debug_query.includes("OR 1=1"))) {
+            if (data.debug_query && (data.debug_query.includes("OR '1'='1'") || data.debug_query.includes("OR 1=1") || data.debug_query.includes("--"))) {
                 console.log('🚨 SQL INJECTION SUCCESSFUL!');
                 console.log('Executed query:', data.debug_query);
                 showMessage('loginMessage', '🎉 SQL INJECTION SUCCESSFUL! Check console for query.', 'success');
+                // Show the SQLi discovery popup
+                const sqliPopup = document.getElementById('sqliPopup');
+                if (sqliPopup) {
+                    sqliPopup.style.display = 'flex';
+                }
             }
             
             setTimeout(() => closeModal('loginModal'), 2000);
@@ -302,31 +322,11 @@ async function addFlower() {
 }
 
 async function viewAllOrders() {
-    try {
-        const response = await fetch(`${API_URL}/api/orders`);
-        const data = await response.json();
-        
-        console.log('🚨 VULNERABILITY: All orders exposed!');
-        console.log('📊 Orders with credit card data:', data);
-        
-        alert('Check console to see ALL orders including credit card numbers! 🚨');
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-    }
+    window.location.href = API_URL + '/orders?from=admin';
 }
 
 async function viewAllUsers() {
-    try {
-        const response = await fetch(`${API_URL}/api/users`);
-        const data = await response.json();
-        
-        console.log('🚨 VULNERABILITY: All users exposed!');
-        console.log('👥 Users with passwords:', data);
-        
-        alert('Check console to see ALL users including passwords! 🚨');
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
+    window.location.href = API_URL + '/users?from=admin';
 }
 
 function showLogin() {
