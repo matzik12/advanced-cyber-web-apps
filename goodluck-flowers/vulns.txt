@@ -5,6 +5,7 @@ Security Misconfiguration:
 Visit: http://localhost:8000/api/debug/config to see ALL secrets!
 API Documentation:
 Visit: http://localhost:8000/docs - Interactive API documentation with all endpoints!
+
 OWASP TOP TEN: A04:2025 – Cryptographic Failures
 show passwords
 
