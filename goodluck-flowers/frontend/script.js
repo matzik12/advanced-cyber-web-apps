@@ -226,8 +226,11 @@ async function sendAIMessage() {
     
     const messagesDiv = document.getElementById('aiMessages');
     
-    // VULNERABILITY: XSS - displaying user input without sanitization
-    messagesDiv.innerHTML += `<div class="message user">${message}</div>`;
+    // Render user input as text so HTML code is shown literally in the bubble.
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.textContent = message;
+    messagesDiv.appendChild(userMsg);
     input.value = '';
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     
@@ -254,10 +257,8 @@ async function sendAIMessage() {
             console.log('🚨 VULNERABILITY EXPLOITED:', data.vulnerability_exploited);
         }
         
-        // VULNERABILITY: XSS - bot response not sanitized
-        const botMsg = document.createElement('div');
-        botMsg.className = 'message bot';
-        botMsg.innerHTML = data.response || data.error;
+        // VULNERABILITY: XSS - bot response not sanitized and scripts intentionally executed
+        const botMsg = createInsecureBotMessage(data.response || data.error);
         messagesDiv.appendChild(botMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         
@@ -266,6 +267,27 @@ async function sendAIMessage() {
         messagesDiv.innerHTML += `<div class="message bot">Error: ${error.message}. Make sure backend is running and you have set ANTHROPIC_API_KEY environment variable.</div>`;
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
+}
+
+function createInsecureBotMessage(content) {
+    const botMsg = document.createElement('div');
+    botMsg.className = 'message bot';
+    botMsg.innerHTML = content;
+
+    // DELIBERATE SELF-XSS DEMO: execute script tags from chatbot output.
+    const scriptTags = botMsg.querySelectorAll('script');
+    scriptTags.forEach((oldScript) => {
+        const newScript = document.createElement('script');
+
+        for (const attr of oldScript.attributes) {
+            newScript.setAttribute(attr.name, attr.value);
+        }
+
+        newScript.textContent = oldScript.textContent;
+        oldScript.replaceWith(newScript);
+    });
+
+    return botMsg;
 }
 
 function toggleAI() {
