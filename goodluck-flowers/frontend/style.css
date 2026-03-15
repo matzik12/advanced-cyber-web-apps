@@ -112,6 +112,94 @@ nav {
     box-shadow: 0 8px 25px rgba(244, 162, 97, 0.5);
 }
 
+.vuln-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.vuln-tab-btn .vuln-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.vuln-tracker {
+    position: fixed;
+    right: -360px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    max-height: 78vh;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+    border: 2px solid #eee;
+    z-index: 1600;
+    transition: right 0.35s ease;
+    overflow: hidden;
+}
+
+.vuln-tracker.open {
+    right: 1rem;
+}
+
+.vuln-tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.vuln-tracker-header h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.vuln-tracker-body {
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(78vh - 72px);
+}
+
+.vuln-item {
+    border: 1px solid #e7e7e7;
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.7rem;
+    background: #fafafa;
+}
+
+.vuln-item-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.35rem;
+}
+
+.vuln-item-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+}
+
+.vuln-item.discovered {
+    background: #e7f7ee;
+    border-color: #8fd3ad;
+}
+
+.vuln-item.discovered .vuln-item-title {
+    color: #156b3f;
+}
+
+.vuln-item.discovered .vuln-item-status {
+    color: #1f8f55;
+}
+
 /* Modal */
 .modal {
     display: none;
