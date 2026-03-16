@@ -243,11 +243,13 @@ window.alert = function(msg) {
     // Check if this is an XSS-triggered alert (from onerror, script injection, etc.)
     if (typeof msg === 'string' && msg.toUpperCase().includes('XSS')) {
         showDiscoveryPopup('xssPopup', 'xss');
+        originalAlert.call(window, msg);
         return;
     }
 
     if (typeof msg === 'string' && msg.toLowerCase().includes('insecure input and output handling for ai poc')) {
         showDiscoveryPopup('llmOutputPopup', 'llm02');
+        originalAlert.call(window, msg);
         return;
     }
     // For all other alerts, use the original
