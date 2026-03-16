@@ -267,6 +267,45 @@
         </div>
     </div>
 
+    <!-- A01 Broken Access Control Popup -->
+    <div class="vuln-popup-overlay" id="bacPopup" style="display:none;">
+        <div class="vuln-popup bac">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Broken Access Control</strong>!</p>
+            <p>Sensitive endpoints are accessible without proper authentication/authorization checks.</p>
+            <span class="vuln-tag">OWASP A01:2025 – Broken Access Control</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('bacPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- A02 Security Misconfiguration Popup -->
+    <div class="vuln-popup-overlay" id="misconfigPopup" style="display:none;">
+        <div class="vuln-popup misconfig">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Security Misconfiguration</strong>!</p>
+            <p>Debug configuration is exposed and leaks internal secrets directly.</p>
+            <span class="vuln-tag">OWASP A02:2025 – Security Misconfiguration</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('misconfigPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- A04 Cryptographic Failures Popup -->
+    <div class="vuln-popup-overlay" id="cryptoPopup" style="display:none;">
+        <div class="vuln-popup crypto">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Cryptographic Failures</strong>!</p>
+            <p>User passwords are exposed in plaintext instead of being securely protected.</p>
+            <span class="vuln-tag">OWASP A04:2025 – Cryptographic Failures</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('cryptoPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
     <!-- LLM Sensitive Information Disclosure Popup -->
     <div class="vuln-popup-overlay" id="llmDisclosurePopup" style="display:none;">
         <div class="vuln-popup llm">
@@ -319,6 +358,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=vuln-tracker-4"></script>
+    <script src="script.js?v=vuln-tracker-5"></script>
 </body>
 </html>

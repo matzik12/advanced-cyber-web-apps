@@ -12,10 +12,13 @@ const a07SessionStateKey = 'a07SessionState';
 const vulnerabilityTrackerItems = [
     { key: 'sqli', title: 'Login Injection' },
     { key: 'xss', title: 'Comment Injection (XSS)' },
-    { key: 'a07', title: 'A07:2025 Weak Session Reuse' },
-    { key: 'api4', title: 'API4:2023 Unrestricted Resource Consumption' },
-    { key: 'llm06', title: 'LLM06:2023 Sensitive Information Disclosure' },
-    { key: 'llm02', title: 'LLM02:2023 Insecure Output Handling' }
+    { key: 'bac', title: 'Broken Access Control' },
+    { key: 'misconfig', title: 'Security Misconfiguration' },
+    { key: 'crypto', title: 'Cryptographic Failures' },
+    { key: 'a07', title: 'Weak Session Reuse' },
+    { key: 'api4', title: 'Unrestricted Resource Consumption' },
+    { key: 'llm06', title: 'Sensitive Information Disclosure' },
+    { key: 'llm02', title: 'Insecure Output Handling' }
 ];
 let vulnerabilityProgress = {};
 
@@ -127,6 +130,13 @@ function getHeaderValue(headers, key) {
     return null;
 }
 
+function getRequestMethod(init) {
+    if (!init || !init.method) {
+        return 'GET';
+    }
+    return String(init.method).toUpperCase();
+}
+
 async function maybeTriggerA07FromAuthResponse(input, init, response) {
     const requestUrl = getRequestUrl(input);
     if (!requestUrl.includes('/api/auth/login')) {
@@ -148,10 +158,44 @@ async function maybeTriggerA07FromAuthResponse(input, init, response) {
     }
 }
 
+async function maybeTriggerCoreApiDiscoveries(input, init, response) {
+    const requestUrl = getRequestUrl(input);
+    const method = getRequestMethod(init);
+    const authHeader = getHeaderValue(init && init.headers, 'Authorization');
+    const hasAuthorization = !!authHeader;
+
+    if (method === 'GET' && requestUrl.includes('/api/debug/config')) {
+        showDiscoveryPopup('misconfigPopup', 'misconfig');
+    }
+
+    if (method === 'GET' && requestUrl.includes('/api/users')) {
+        if (!hasAuthorization) {
+            showDiscoveryPopup('bacPopup', 'bac');
+        }
+
+        try {
+            const payload = await response.clone().json();
+            const exposesPasswords = Array.isArray(payload.users) && payload.users.some(user => !!user.password);
+            if (exposesPasswords) {
+                showDiscoveryPopup('cryptoPopup', 'crypto');
+            }
+        } catch (error) {
+            // ignore non-JSON responses
+        }
+    }
+
+    if (method === 'GET' && requestUrl.includes('/api/orders') && !requestUrl.includes('/api/orders/')) {
+        if (!hasAuthorization) {
+            showDiscoveryPopup('bacPopup', 'bac');
+        }
+    }
+}
+
 window.fetch = async function(input, init) {
     maybeTriggerApi4Popup(input);
     const response = await originalFetch(input, init);
     await maybeTriggerA07FromAuthResponse(input, init, response);
+    await maybeTriggerCoreApiDiscoveries(input, init, response);
     return response;
 };
 
