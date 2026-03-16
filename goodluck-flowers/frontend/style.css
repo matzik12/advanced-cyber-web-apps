@@ -876,3 +876,18 @@ nav {
 .vuln-popup.api4 .vuln-tag { background: #1f8a70; }
 .vuln-popup.api4 .vuln-dismiss-btn { background: #146350; }
 .vuln-popup.api4 .vuln-dismiss-btn:hover { background: #0e4a3c; }
+
+/* A07 popup - deep blue theme */
+.vuln-popup.a07 {
+    background: linear-gradient(135deg, #e5ecff 0%, #cfdbff 100%);
+    border: 3px solid #3f5fbf;
+    box-shadow: 0 20px 60px rgba(63, 95, 191, 0.35);
+    max-width: 460px;
+    width: 88%;
+    padding: 2.2rem 2rem;
+}
+.vuln-popup.a07 h2 { color: #2f478f; }
+.vuln-popup.a07 p { color: #25396f; }
+.vuln-popup.a07 .vuln-tag { background: #3f5fbf; }
+.vuln-popup.a07 .vuln-dismiss-btn { background: #2f478f; }
+.vuln-popup.a07 .vuln-dismiss-btn:hover { background: #223468; }

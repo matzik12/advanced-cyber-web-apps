@@ -8,9 +8,11 @@ let api4RequestTimestamps = [];
 let api4PopupShown = false;
 
 const vulnerabilityProgressKey = 'vulnerabilityProgress';
+const a07SessionStateKey = 'a07SessionState';
 const vulnerabilityTrackerItems = [
     { key: 'sqli', title: 'Login Injection' },
     { key: 'xss', title: 'Comment Injection (XSS)' },
+    { key: 'a07', title: 'A07:2025 Weak Session Reuse' },
     { key: 'api4', title: 'API4:2023 Unrestricted Resource Consumption' },
     { key: 'llm06', title: 'LLM06:2023 Sensitive Information Disclosure' },
     { key: 'llm02', title: 'LLM02:2023 Insecure Output Handling' }
@@ -95,9 +97,62 @@ function maybeTriggerApi4Popup(input) {
     }
 }
 
-window.fetch = function(input, init) {
+function getRequestUrl(input) {
+    if (typeof input === 'string') {
+        return input;
+    }
+    if (input && input.url) {
+        return input.url;
+    }
+    return '';
+}
+
+function getHeaderValue(headers, key) {
+    if (!headers) return null;
+
+    if (headers instanceof Headers) {
+        return headers.get(key);
+    }
+
+    if (Array.isArray(headers)) {
+        const found = headers.find(([k]) => String(k).toLowerCase() === key.toLowerCase());
+        return found ? found[1] : null;
+    }
+
+    if (typeof headers === 'object') {
+        const normalized = Object.keys(headers).find(k => k.toLowerCase() === key.toLowerCase());
+        return normalized ? headers[normalized] : null;
+    }
+
+    return null;
+}
+
+async function maybeTriggerA07FromAuthResponse(input, init, response) {
+    const requestUrl = getRequestUrl(input);
+    if (!requestUrl.includes('/api/auth/login')) {
+        return;
+    }
+
+    const flowHeader = getHeaderValue(init && init.headers, 'X-App-Flow');
+    if (flowHeader === 'login-ui') {
+        return;
+    }
+
+    try {
+        const payload = await response.clone().json();
+        if (payload && payload.session_reused === true) {
+            showDiscoveryPopup('a07Popup', 'a07');
+        }
+    } catch (error) {
+        // Ignore non-JSON responses
+    }
+}
+
+window.fetch = async function(input, init) {
     maybeTriggerApi4Popup(input);
-    return originalFetch(input, init);
+    const response = await originalFetch(input, init);
+    await maybeTriggerA07FromAuthResponse(input, init, response);
+    return response;
 };
 
 function normalizePromptForMatch(text) {
@@ -242,7 +297,10 @@ async function login() {
     try {
         const response = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-App-Flow': 'login-ui'
+            },
             body: JSON.stringify({ username, password })
         });
         
@@ -250,9 +308,23 @@ async function login() {
         console.log('🔐 Login response:', data);
         
         if (data.success) {
+            const a07State = JSON.parse(sessionStorage.getItem(a07SessionStateKey) || '{}');
+            const userState = a07State[data.user.username] || { lastToken: null, hasLoggedOut: false };
+            const tokenReusedFromClientView = !!userState.lastToken && userState.lastToken === data.user.token;
+
             // VULNERABILITY: Store sensitive data in localStorage
             localStorage.setItem('user', JSON.stringify(data.user));
             currentUser = data.user;
+
+            if (data.session_reused === true && tokenReusedFromClientView && userState.hasLoggedOut) {
+                showDiscoveryPopup('a07Popup', 'a07');
+            }
+
+            a07State[data.user.username] = {
+                lastToken: data.user.token,
+                hasLoggedOut: false
+            };
+            sessionStorage.setItem(a07SessionStateKey, JSON.stringify(a07State));
             
             showMessage('loginMessage', '✅ Login successful!', 'success');
             
@@ -283,6 +355,14 @@ async function login() {
 }
 
 function logout() {
+    if (currentUser && currentUser.username) {
+        const a07State = JSON.parse(sessionStorage.getItem(a07SessionStateKey) || '{}');
+        const userState = a07State[currentUser.username] || { lastToken: null, hasLoggedOut: false };
+        userState.hasLoggedOut = true;
+        a07State[currentUser.username] = userState;
+        sessionStorage.setItem(a07SessionStateKey, JSON.stringify(a07State));
+    }
+
     localStorage.removeItem('user');
     currentUser = null;
     document.getElementById('adminBtn').style.display = 'none';

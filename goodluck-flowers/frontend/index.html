@@ -187,6 +187,15 @@
                     <div class="clue-text">Try: <code>http://localhost:8000/api/users</code></div>
                 </div>
             </div>
+
+            <div class="vulnerability-category">
+                <h3>🔐 OWASP A07:2025 – Authentication Failures</h3>
+
+                <div class="clue">
+                    <div class="clue-title">Weak Session Reuse</div>
+                    <div class="clue-text">Login twice with the same user and compare the token from DevTools (Network or Local Storage).</div>
+                </div>
+            </div>
             
             <div class="vulnerability-category">
                 <h3>🔌 OWASP A05: SQL Injection & XSS</h3>
@@ -297,6 +306,19 @@
         </div>
     </div>
 
-    <script src="script.js?v=vuln-tracker-2"></script>
+    <!-- A07 Authentication Failures Popup -->
+    <div class="vuln-popup-overlay" id="a07Popup" style="display:none;">
+        <div class="vuln-popup a07">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Authentication Failures</strong>!</p>
+            <p>Session tokens are predictable and reused across logins, making session attacks easier.</p>
+            <span class="vuln-tag">OWASP A07:2025 – Authentication Failures</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('a07Popup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=vuln-tracker-4"></script>
 </body>
 </html>
