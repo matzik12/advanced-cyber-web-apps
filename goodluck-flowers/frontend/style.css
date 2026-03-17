@@ -112,6 +112,94 @@ nav {
     box-shadow: 0 8px 25px rgba(244, 162, 97, 0.5);
 }
 
+.vuln-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.vuln-tab-btn .vuln-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.vuln-tracker {
+    position: fixed;
+    right: -360px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    max-height: 78vh;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+    border: 2px solid #eee;
+    z-index: 1600;
+    transition: right 0.35s ease;
+    overflow: hidden;
+}
+
+.vuln-tracker.open {
+    right: 1rem;
+}
+
+.vuln-tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.vuln-tracker-header h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.vuln-tracker-body {
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(78vh - 72px);
+}
+
+.vuln-item {
+    border: 1px solid #e7e7e7;
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.7rem;
+    background: #fafafa;
+}
+
+.vuln-item-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.35rem;
+}
+
+.vuln-item-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+}
+
+.vuln-item.discovered {
+    background: #e7f7ee;
+    border-color: #8fd3ad;
+}
+
+.vuln-item.discovered .vuln-item-title {
+    color: #156b3f;
+}
+
+.vuln-item.discovered .vuln-item-status {
+    color: #1f8f55;
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -743,3 +831,48 @@ nav {
 .vuln-popup.xss .vuln-tag { background: #f4a261; }
 .vuln-popup.xss .vuln-dismiss-btn { background: #856404; }
 .vuln-popup.xss .vuln-dismiss-btn:hover { background: #664d03; }
+
+/* LLM popup - purple theme */
+.vuln-popup.llm {
+    background: linear-gradient(135deg, #efe7ff 0%, #decfff 100%);
+    border: 3px solid #8b4789;
+    box-shadow: 0 20px 60px rgba(139, 71, 137, 0.35);
+    max-width: 460px;
+    width: 88%;
+    padding: 2.2rem 2rem;
+}
+.vuln-popup.llm h2 { color: #5c2f5b; }
+.vuln-popup.llm p { color: #3f2b4a; }
+.vuln-popup.llm .vuln-tag { background: #8b4789; }
+.vuln-popup.llm .vuln-dismiss-btn { background: #5c2f5b; }
+.vuln-popup.llm .vuln-dismiss-btn:hover { background: #432242; }
+
+/* LLM02 popup - blue theme */
+.vuln-popup.llm02 {
+    background: linear-gradient(135deg, #e7f2ff 0%, #cfe6ff 100%);
+    border: 3px solid #2a6fbd;
+    box-shadow: 0 20px 60px rgba(42, 111, 189, 0.35);
+    max-width: 460px;
+    width: 88%;
+    padding: 2.2rem 2rem;
+}
+.vuln-popup.llm02 h2 { color: #1f4f87; }
+.vuln-popup.llm02 p { color: #1c3d63; }
+.vuln-popup.llm02 .vuln-tag { background: #2a6fbd; }
+.vuln-popup.llm02 .vuln-dismiss-btn { background: #1f4f87; }
+.vuln-popup.llm02 .vuln-dismiss-btn:hover { background: #173b65; }
+
+/* API4 popup - teal theme */
+.vuln-popup.api4 {
+    background: linear-gradient(135deg, #e4f8f4 0%, #c8f1e9 100%);
+    border: 3px solid #1f8a70;
+    box-shadow: 0 20px 60px rgba(31, 138, 112, 0.35);
+    max-width: 460px;
+    width: 88%;
+    padding: 2.2rem 2rem;
+}
+.vuln-popup.api4 h2 { color: #146350; }
+.vuln-popup.api4 p { color: #0f4c3f; }
+.vuln-popup.api4 .vuln-tag { background: #1f8a70; }
+.vuln-popup.api4 .vuln-dismiss-btn { background: #146350; }
+.vuln-popup.api4 .vuln-dismiss-btn:hover { background: #0e4a3c; }
