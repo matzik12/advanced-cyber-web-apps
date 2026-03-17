@@ -114,8 +114,14 @@ async def login(request: LoginRequest):
         user = cursor.fetchone()
         
         if user:
-            # Create session token
-            token = secrets.token_hex(32)
+            cursor.execute("SELECT token FROM sessions WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user['id'],))
+            existing_session = cursor.fetchone()
+
+            # VULNERABILITY: Weak session token generation
+            # Predictable and reusable token that does not rotate securely
+            token = f"weak-session-{user['id']}"
+            session_reused = bool(existing_session and existing_session['token'] == token)
+            cursor.execute("DELETE FROM sessions WHERE user_id = ?", (user['id'],))
             cursor.execute("INSERT INTO sessions (user_id, token) VALUES (?, ?)", 
                         (user['id'], token))
             conn.commit()
@@ -138,7 +144,10 @@ async def login(request: LoginRequest):
                 "message": "Login successful",
                 "user": user_data,
                 # VULNERABILITY: Expose query in response
-                "debug_query": query
+                "debug_query": query,
+                # VULNERABILITY (A07): Explicit weak-session evidence in response
+                "session_reused": session_reused,
+                "auth_failure": "Weak session token reuse" if session_reused else None
             }
         else:
             conn.close()
