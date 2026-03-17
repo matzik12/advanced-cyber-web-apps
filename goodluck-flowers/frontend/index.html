@@ -164,13 +164,18 @@
                 </div>
 
                 <div class="clue">
-                    <div class="clue-title">Security Misconfiguration</div>
-                    <div class="clue-text">Try: <code>http://localhost:8000/api/debug/config</code></div>
-                </div>
-
-                <div class="clue">
                     <div class="clue-title">API Documentation</div>
                     <div class="clue-text">Try: <code>http://localhost:8000/docs</code></div>
+                </div>
+            </div>
+ 
+
+            <div class="vulnerability-category">
+                <h3>🔌 OWASP A02:2025 Security Misconfiguration</h3>
+
+                <div class="clue">
+                    <div class="clue-title">Debug Configuration</div>
+                    <div class="clue-text">Try: <code>http://localhost:8000/api/debug/config</code></div>
                 </div>
             </div>
 
@@ -180,6 +185,15 @@
                 <div class="clue">
                     <div class="clue-title">Weak Password Policy</div>
                     <div class="clue-text">Try: <code>http://localhost:8000/api/users</code></div>
+                </div>
+            </div>
+
+            <div class="vulnerability-category">
+                <h3>🔐 OWASP A07:2025 – Authentication Failures</h3>
+
+                <div class="clue">
+                    <div class="clue-title">Weak Session Reuse</div>
+                    <div class="clue-text">Login twice with the same user and compare the token from DevTools (Network or Local Storage).</div>
                 </div>
             </div>
             
@@ -253,6 +267,45 @@
         </div>
     </div>
 
+    <!-- A01 Broken Access Control Popup -->
+    <div class="vuln-popup-overlay" id="bacPopup" style="display:none;">
+        <div class="vuln-popup bac">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Broken Access Control</strong>!</p>
+            <p>Sensitive endpoints are accessible without proper authentication/authorization checks.</p>
+            <span class="vuln-tag">OWASP A01:2025 – Broken Access Control</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('bacPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- A02 Security Misconfiguration Popup -->
+    <div class="vuln-popup-overlay" id="misconfigPopup" style="display:none;">
+        <div class="vuln-popup misconfig">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Security Misconfiguration</strong>!</p>
+            <p>Debug configuration is exposed and leaks internal secrets directly.</p>
+            <span class="vuln-tag">OWASP A02:2025 – Security Misconfiguration</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('misconfigPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <!-- A04 Cryptographic Failures Popup -->
+    <div class="vuln-popup-overlay" id="cryptoPopup" style="display:none;">
+        <div class="vuln-popup crypto">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Cryptographic Failures</strong>!</p>
+            <p>User passwords are exposed in plaintext instead of being securely protected.</p>
+            <span class="vuln-tag">OWASP A04:2025 – Cryptographic Failures</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('cryptoPopup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
     <!-- LLM Sensitive Information Disclosure Popup -->
     <div class="vuln-popup-overlay" id="llmDisclosurePopup" style="display:none;">
         <div class="vuln-popup llm">
@@ -292,6 +345,19 @@
         </div>
     </div>
 
-    <script src="script.js?v=vuln-tracker-2"></script>
+    <!-- A07 Authentication Failures Popup -->
+    <div class="vuln-popup-overlay" id="a07Popup" style="display:none;">
+        <div class="vuln-popup a07">
+            <div class="vuln-icon">🏆</div>
+            <h2>Congratulations!</h2>
+            <p>You discovered <strong>Authentication Failures</strong>!</p>
+            <p>Session tokens are predictable and reused across logins, making session attacks easier.</p>
+            <span class="vuln-tag">OWASP A07:2025 – Authentication Failures</span>
+            <br>
+            <button class="vuln-dismiss-btn" onclick="document.getElementById('a07Popup').style.display='none'">Got it!</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=vuln-tracker-5"></script>
 </body>
 </html>

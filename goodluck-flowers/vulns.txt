@@ -1,10 +1,11 @@
 OWASP TOP TEN: A01:2025 Broken Access Control
 http://localhost:8000/users
 http://localhost:8000/orders
-Security Misconfiguration: 
-Visit: http://localhost:8000/api/debug/config to see ALL secrets!
 API Documentation:
 Visit: http://localhost:8000/docs - Interactive API documentation with all endpoints!
+
+OWASP TOP TEN: A02:2025 Security Misconfiguration
+Visit: http://localhost:8000/api/debug/config to see ALL secrets!
 
 OWASP TOP TEN: A04:2025 – Cryptographic Failures
 show passwords
@@ -19,6 +20,10 @@ There's a superadmin account in the database. Try SQL injection or check /api/us
 flowers comments:
 header: whatever_you_want
 content: <img src=x onerror="alert('XSS Vulnerability! You have been hacked!')">
+
+OWASP TOP TEN: A07:2025 - Authentication Failures
+Weak Session Reuse:
+Login twice with the same user and compare token value in Local Storage or Network response.
 
 OWASP TOP TEN: API4:2023 Unrestricted Resource Consumption
 Send unlimited AI messages with: for(let i=0;i<100;i++) fetch('http://localhost:8000/api/ai/chat', 
