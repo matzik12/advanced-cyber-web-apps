@@ -6,7 +6,7 @@ services:
     build: .
     container_name: scanner_server
     ports:
-      - "8000:8000"
+      - "8025:8000"
     volumes:
       # 1. Access host Docker socket to run external tools (Zap/Nuclei)
       - /var/run/docker.sock:/var/run/docker.sock
